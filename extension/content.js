@@ -149,18 +149,6 @@ function getDomain(url) {
   }
 }
 
-function normalizeTextKey(text) {
-  return (text || "")
-    .toLowerCase()
-    .replaceAll("ä", "ae")
-    .replaceAll("ö", "oe")
-    .replaceAll("ü", "ue")
-    .replaceAll("ß", "ss")
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim()
-    .replace(/\s+/g, " ");
-}
-
 function trimDetailNoise(text) {
   if (!text) return null;
 
@@ -367,36 +355,7 @@ function extractApplyUrl(source) {
   return null;
 }
 
-function buildDuplicateKey(title, company, locationText, applyUrl) {
-  const applyDomain = getDomain(applyUrl);
-
-  if (applyUrl) {
-    const parsed = new URL(applyUrl);
-    for (const key of ["jobId", "job_id", "jk", "gh_jid", "source_id", "id"]) {
-      const value = parsed.searchParams.get(key);
-      if (value) {
-        return `apply:${applyDomain}:${key}:${normalizeTextKey(value)}`;
-      }
-    }
-
-    const pathKey = normalizeTextKey(parsed.pathname);
-    if (applyDomain && pathKey) {
-      return `apply:${applyDomain}:${pathKey}`;
-    }
-  }
-
-  const titleKey = normalizeTextKey(title);
-  const companyKey = normalizeTextKey(company);
-  const locationKey = normalizeTextKey(locationText) || "unknown-location";
-
-  if (titleKey && companyKey) {
-    return `content:${companyKey}:${titleKey}:${locationKey}`;
-  }
-
-  return null;
-}
-
-function parseJobDetailFromPage(sourceRecord, runId) {
+function parseJobDetailFromPage(sourceRecord) {
   const source = sourceRecord?.source || detectJobSource(location.href) || "unknown";
   const now = new Date().toISOString();
   const description = extractDetailDescription(source);
@@ -410,31 +369,17 @@ function parseJobDetailFromPage(sourceRecord, runId) {
     source_job_url: sourceRecord?.url || location.href,
     source,
     sources: source ? [source] : [],
-    first_seen_at: sourceRecord?.collectedAt || now,
-    last_seen_at: sourceRecord?.collectedAt || now,
-    times_seen: 1,
-    run_ids: sourceRecord?.runId ? [sourceRecord.runId] : [],
     search_urls: sourceRecord?.searchUrl ? [sourceRecord.searchUrl] : [],
     search_queries: sourceRecord?.searchQuery ? [sourceRecord.searchQuery] : [],
-    search_locations: sourceRecord?.searchLocation ? [sourceRecord.searchLocation] : [],
-    result_page_number: sourceRecord?.resultPageNumber || null,
     title,
     company,
     location_raw: locationRaw,
     description_raw: description.text,
     workplace_type_raw: null,
     employment_type_raw: null,
-    job_insight_items: [],
     apply_url: applyUrl,
-    apply_domain: getDomain(applyUrl),
-    duplicate_key: buildDuplicateKey(title, company, locationRaw, applyUrl),
-    parse_source: source,
-    parse_quality: description.quality,
-    page_loaded: true,
     parse_success: Boolean(title || company || locationRaw || description.text),
-    parse_error: null,
-    parsed_at: now,
-    detail_run_id: runId
+    parsed_at: now
   };
 }
 
@@ -1076,10 +1021,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message && message.type === "PARSE_JOB_DETAIL") {
     (async () => {
       try {
-        const record = parseJobDetailFromPage(
-          message.sourceRecord || null,
-          message.runId
-        );
+        const record = parseJobDetailFromPage(message.sourceRecord || null);
 
         sendResponse({
           success: true,
