@@ -1,14 +1,7 @@
-import classify_job
-print("[DEBUG] classify_job file:", classify_job.__file__)
-print("[DEBUG] classify_job version:", getattr(classify_job, "VERSION", "NO_VERSION"))
-
 from utils import ensure_directories, read_json_file, write_json_file
 from config import (
-    RAW_EXPORTS_DIR,
-    MERGED_DIR,
     PARSED_DIR,
     FILTERED_DIR,
-    LOGS_DIR,
     PARSED_OUTPUT_FILE,
     CLASSIFIED_OUTPUT_FILE,
     SHORTLIST_OUTPUT_FILE,
@@ -113,7 +106,7 @@ def classify_single_job(job: dict) -> dict:
 
 
 def main() -> None:
-    ensure_directories([RAW_EXPORTS_DIR, MERGED_DIR, PARSED_DIR, FILTERED_DIR, LOGS_DIR])
+    ensure_directories([PARSED_DIR, FILTERED_DIR])
 
     parsed_jobs = read_json_file(PARSED_OUTPUT_FILE)
     classified_jobs = [classify_single_job(job) for job in parsed_jobs]

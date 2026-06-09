@@ -1,6 +1,6 @@
 # Jobseeker Automation Pipeline
 
-This project is a browser-extension plus Python backend pipeline for collecting job postings, deduplicating them, applying deterministic hard filters, scoring the remaining jobs with an OpenAI-compatible LLM API, and exporting a prioritized Excel application list.
+This project is a browser-extension plus Python backend pipeline for collecting job postings, normalizing them, applying deterministic hard filters, scoring the remaining jobs with an OpenAI-compatible LLM API, and exporting a prioritized Excel application list.
 
 The repository is intentionally sanitized. It does not contain API keys, browser profiles, cookies, scraped job descriptions, application results, or private candidate data.
 
@@ -12,17 +12,17 @@ Job search across multiple portals is repetitive and noisy. I built this tool to
 2. Visit search pages in a browser extension and collect visible job links.
 3. Export parsed job detail records from the extension.
 4. Import and normalize the records in the backend.
-5. Deduplicate the same job across multiple sources.
+5. Generate duplicate keys and optional duplicate-cluster debug output.
 6. Reject clear mismatches with rule-based filters.
 7. Score realistic candidates with an LLM.
-8. Export a compact Excel list sorted by fit score.
+8. Export a compact Excel list sorted by LLM fit score.
 
 ## Main Features
 
 - Multi-source search support for Indeed, StepStone, LinkedIn, Xing, Arbeitsagentur, and Stellenwerk.
 - Round-robin queue generation to spread requests across sources and pages.
 - Browser extension UI for importing queues, collecting URLs, parsing detail pages, and exporting JSONL records.
-- Python backend for normalization, deduplication, hard filtering, LLM scoring, and Excel export.
+- Python backend for normalization, duplicate analysis, hard filtering, LLM scoring, and Excel export.
 - Configurable search groups for working student roles, internships, HiWi roles, and thesis opportunities.
 - OpenAI-compatible LLM integration, with DeepSeek defaults configurable through environment variables.
 - Local-only cache for LLM results to avoid paying twice for the same job/profile pair.
@@ -59,7 +59,7 @@ prioritized Excel application queue
 - Python 3
 - JavaScript browser extension
 - YAML configuration
-- Rule-based filtering and duplicate clustering
+- Rule-based hard filtering and optional duplicate clustering
 - OpenAI-compatible chat completions API
 - Excel export with `openpyxl`
 
@@ -87,6 +87,18 @@ PYTHONPATH=backend python3 backend/build_search_urls.py \
   --max-per-source 400 \
   --max-total 1600 \
   --output-suffix expanded_today
+```
+
+Import the latest parsed-details export from the extension:
+
+```bash
+PYTHONPATH=backend python3 backend/import_extension_parsed.py
+```
+
+Optionally inspect duplicate clusters:
+
+```bash
+PYTHONPATH=backend python3 backend/cluster_duplicates.py
 ```
 
 Run a small LLM scoring pilot:

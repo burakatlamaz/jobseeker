@@ -3,17 +3,10 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 
-RAW_EXPORTS_DIR = DATA_DIR / "raw_exports"
-MERGED_DIR = DATA_DIR / "merged"
 PARSED_DIR = DATA_DIR / "parsed"
 FILTERED_DIR = DATA_DIR / "filtered"
-LOGS_DIR = DATA_DIR / "logs"
 SEARCH_DIR = DATA_DIR / "search"
-DISCOVERED_DIR = DATA_DIR / "discovered"
 PARSED_EXPORTS_DIR = DATA_DIR / "parsed_exports"
-
-MERGED_OUTPUT_FILE = MERGED_DIR / "merged_jobs.json"
-MERGED_DEBUG_FILE = MERGED_DIR / "merged_jobs_debug.json"
 
 PARSED_OUTPUT_FILE = PARSED_DIR / "parsed_jobs.json"
 PARSED_DEBUG_FILE = PARSED_DIR / "parsed_jobs_debug.json"
@@ -32,17 +25,3 @@ LLM_CACHE_DIR = DATA_DIR / "llm_cache"
 
 SEARCH_URLS_OUTPUT_FILE = SEARCH_DIR / "search_urls.json"
 SEARCH_URLS_JSONL_OUTPUT_FILE = SEARCH_DIR / "search_urls.jsonl"
-
-DISCOVERED_JOBS_JSONL_OUTPUT_FILE = DISCOVERED_DIR / "discovered_jobs.jsonl"
-DISCOVERY_DEBUG_OUTPUT_FILE = DISCOVERED_DIR / "discovery_debug.json"
-
-PLAYWRIGHT_USER_DATA_DIR = BASE_DIR / "playwright_user_data"
-
-DEFAULT_PARSE_LIMIT = None
-
-USE_CHROME_CHANNEL = True
-HEADLESS = False
-
-PAGE_LOAD_TIMEOUT_MS = 30000
-AFTER_LOAD_WAIT_MS = 2500
-BETWEEN_JOBS_WAIT_MS = 1200
