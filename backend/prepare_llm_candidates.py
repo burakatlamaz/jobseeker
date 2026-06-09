@@ -218,7 +218,6 @@ def build_candidate(job: dict, index: int) -> dict:
         "candidate_id": f"job_{index:04d}",
         "source_job_url": job.get("source_job_url") or job.get("url"),
         "apply_url": job.get("apply_url"),
-        "apply_domain": job.get("apply_domain"),
         "sources": job.get("sources") or [],
         "title": job.get("title"),
         "company": job.get("company"),

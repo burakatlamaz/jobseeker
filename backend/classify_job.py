@@ -1,4 +1,3 @@
-from urllib.parse import urlparse, parse_qs, unquote_plus
 import re
 
 VERSION = "classify_job_2026_04_08_final_v2"
@@ -41,43 +40,18 @@ def title_level_match(text: str) -> str | None:
     return regex_match_any(text, patterns)
 
 
-def extract_query_keywords(search_urls: list[str]) -> list[str]:
-    keywords = []
-
-    for url in search_urls or []:
-        try:
-            parsed = urlparse(url)
-            query = parse_qs(parsed.query)
-            values = query.get("keywords", [])
-            for value in values:
-                decoded = unquote_plus(value).strip()
-                if decoded and decoded not in keywords:
-                    keywords.append(decoded)
-        except Exception:
-            continue
-
-    return keywords
-
-
 def build_compact_job_view(parsed_job: dict) -> dict:
-    search_keywords = extract_query_keywords(parsed_job.get("search_urls", []))
-
     return {
         "url": parsed_job.get("url"),
         "source_job_url": parsed_job.get("source_job_url"),
         "apply_url": parsed_job.get("apply_url"),
-        "apply_domain": parsed_job.get("apply_domain"),
-        "duplicate_key": parsed_job.get("duplicate_key"),
         "sources": parsed_job.get("sources", []),
         "title": parsed_job.get("title"),
         "company": parsed_job.get("company"),
-        "times_seen": parsed_job.get("times_seen", 0),
-        "search_count": len(search_keywords),
-        "search_keywords": search_keywords,
+        "search_keywords": parsed_job.get("search_keywords", []),
         "workplace_type_raw": parsed_job.get("workplace_type_raw"),
         "employment_type_raw": parsed_job.get("employment_type_raw"),
         "description_raw": parsed_job.get("description_raw"),
-        "parse_quality": parsed_job.get("parse_quality"),
     }
 
 
@@ -270,7 +244,6 @@ def classify_workplace_and_location(
     company: str,
     location_raw: str | None = None,
     workplace_type_raw: str | None = None,
-    search_urls: list[str] | None = None,
 ) -> dict:
     location_text = normalize_text(location_raw or "")
     metadata_text = normalize_text(workplace_type_raw or "")

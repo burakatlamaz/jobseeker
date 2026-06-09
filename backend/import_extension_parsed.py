@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+from urllib.parse import parse_qs, urlparse, unquote_plus
 
 from config import (
     PARSED_DIR,
@@ -123,19 +124,34 @@ def repair_linkedin_fields(row: dict) -> dict:
     return row
 
 
-def build_duplicate_key(row: dict) -> str | None:
-    existing = row.get("duplicate_key")
-    if existing and "safety go" not in existing and "safety/go" not in existing:
-        return row.get("duplicate_key")
+def extract_search_keywords(row: dict) -> list[str]:
+    keywords = []
+    raw_queries = row.get("search_queries") or []
+    if row.get("searchQuery"):
+        raw_queries.append(row.get("searchQuery"))
 
-    title = compact_line(row.get("title") or "").lower()
-    company = compact_line(row.get("company") or "").lower()
-    location = compact_line(row.get("location_raw") or "").lower() or "unknown-location"
+    for query in raw_queries:
+        normalized = compact_line(query)
+        if normalized and normalized not in keywords:
+            keywords.append(normalized)
 
-    if title and company:
-        return f"content:{company}:{title}:{location}"
+    search_urls = row.get("search_urls") or []
+    if row.get("searchUrl"):
+        search_urls.append(row.get("searchUrl"))
 
-    return None
+    for url in search_urls:
+        try:
+            parsed = urlparse(url)
+            params = parse_qs(parsed.query)
+            for key in ("keywords", "q", "what", "was"):
+                for value in params.get(key, []):
+                    decoded = unquote_plus(value).strip()
+                    if decoded and decoded not in keywords:
+                        keywords.append(decoded)
+        except Exception:
+            continue
+
+    return keywords
 
 
 def find_input_file(explicit_path: str | None) -> Path:
@@ -164,35 +180,17 @@ def normalize_row(row: dict) -> dict:
     normalized = {
         "url": row.get("url") or source_job_url,
         "source_job_url": source_job_url,
-        "first_seen_at": row.get("first_seen_at") or row.get("collectedAt"),
-        "last_seen_at": row.get("last_seen_at") or row.get("collectedAt"),
-        "times_seen": row.get("times_seen", 1),
-        "run_ids": row.get("run_ids") or ([row.get("runId")] if row.get("runId") else []),
-        "search_urls": row.get("search_urls") or ([row.get("searchUrl")] if row.get("searchUrl") else []),
         "sources": row.get("sources") or ([source] if source else []),
-        "search_queries": row.get("search_queries") or ([row.get("searchQuery")] if row.get("searchQuery") else []),
-        "search_locations": row.get("search_locations") or ([row.get("searchLocation")] if row.get("searchLocation") else []),
+        "search_keywords": extract_search_keywords(row),
         "title": row.get("title"),
         "company": row.get("company"),
         "location_raw": row.get("location_raw") or row.get("location"),
         "description_raw": trim_description(row.get("description_raw")),
-        "requirements_raw": row.get("requirements_raw"),
         "workplace_type_raw": row.get("workplace_type_raw") or workplace_type,
         "employment_type_raw": row.get("employment_type_raw") or employment_type,
-        "job_insight_items": row.get("job_insight_items") or [],
         "apply_url": row.get("apply_url"),
-        "apply_domain": row.get("apply_domain"),
-        "duplicate_key": row.get("duplicate_key"),
-        "parse_source": row.get("parse_source") or source,
-        "parse_quality": row.get("parse_quality") or "unknown",
-        "page_loaded": bool(row.get("page_loaded", True)),
-        "parse_success": bool(row.get("parse_success")),
-        "parse_error": row.get("parse_error"),
-        "parsed_at": row.get("parsed_at"),
-        "detail_run_id": row.get("detail_run_id"),
     }
 
-    normalized["duplicate_key"] = build_duplicate_key(normalized)
     return normalized
 
 
@@ -206,9 +204,8 @@ def main() -> None:
     input_file = find_input_file(args.input)
     rows = read_jsonl_file(input_file)
     normalized = [normalize_row(row) for row in rows]
-
-    successful = [row for row in normalized if row.get("parse_success")]
-    failed = [row for row in normalized if not row.get("parse_success")]
+    successful_count = sum(1 for row in rows if row.get("parse_success"))
+    failed_count = len(rows) - successful_count
 
     write_json_file(PARSED_OUTPUT_FILE, normalized)
     write_json_file(
@@ -216,16 +213,16 @@ def main() -> None:
         {
             "input_file": str(input_file),
             "parsed_count": len(normalized),
-            "successful_count": len(successful),
-            "failed_count": len(failed),
+            "successful_count": successful_count,
+            "failed_count": failed_count,
             "sample": normalized[:5],
         },
     )
 
     print(f"[INFO] Imported parsed export: {input_file}")
     print(f"[INFO] Parsed rows: {len(normalized)}")
-    print(f"[INFO] Successful rows: {len(successful)}")
-    print(f"[INFO] Failed rows: {len(failed)}")
+    print(f"[INFO] Successful rows: {successful_count}")
+    print(f"[INFO] Failed rows: {failed_count}")
     print(f"[INFO] Output written to: {PARSED_OUTPUT_FILE}")
 
 

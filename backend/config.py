@@ -10,8 +10,6 @@ PARSED_EXPORTS_DIR = DATA_DIR / "parsed_exports"
 
 PARSED_OUTPUT_FILE = PARSED_DIR / "parsed_jobs.json"
 PARSED_DEBUG_FILE = PARSED_DIR / "parsed_jobs_debug.json"
-JOB_CLUSTERS_OUTPUT_FILE = PARSED_DIR / "job_clusters.json"
-JOB_CLUSTERS_DEBUG_FILE = PARSED_DIR / "job_clusters_debug.json"
 
 CLASSIFIED_OUTPUT_FILE = FILTERED_DIR / "classified_jobs_full.json"
 SHORTLIST_OUTPUT_FILE = FILTERED_DIR / "shortlist.json"

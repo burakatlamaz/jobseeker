@@ -19,7 +19,6 @@ def classify_single_job(job: dict) -> dict:
     title = job.get("title") or ""
     description = job.get("description_raw") or ""
     company = job.get("company") or ""
-    search_urls = job.get("search_urls", []) or []
     employment_type_raw = job.get("employment_type_raw")
     workplace_type_raw = job.get("workplace_type_raw")
     location_raw = job.get("location_raw")
@@ -64,7 +63,6 @@ def classify_single_job(job: dict) -> dict:
         company,
         location_raw=location_raw,
         workplace_type_raw=workplace_type_raw,
-        search_urls=search_urls,
     )
 
     hard_reject_reasons = []
