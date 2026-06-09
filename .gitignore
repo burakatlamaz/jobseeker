@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Local environments and secrets
+.env
+.env.local
+.env.*.local
+!.env.local.example
+venv/
+.venv/
+
+# Private candidate data
+backend/candidate_profile.yaml
+
+# Generated job-search data
+backend/data/*
+!backend/data/.gitkeep
+backend/playwright_user_data/
+backend/playwright_profiles/
+
+# OS/editor noise
+.DS_Store
+*.swp

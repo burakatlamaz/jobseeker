@@ -1,0 +1,84 @@
+version: 1
+
+candidate:
+  education:
+    current_degree: "M.Sc. Computer Science"
+    university: "Example University"
+    status: "coursework completed, thesis pending"
+  languages:
+    english: "professional"
+    german: "basic"
+  skills:
+    programming:
+      - Python
+      - JavaScript
+      - C++
+    backend:
+      - REST APIs
+      - data pipelines
+      - automation scripts
+    data_ai:
+      - machine learning basics
+      - LLM API integration
+      - pandas
+    tools:
+      - Git
+      - Docker
+      - Linux
+
+target_search:
+  primary_locations:
+    - "Darmstadt"
+    - "Frankfurt am Main"
+    - "Mainz"
+    - "Wiesbaden"
+    - "Heidelberg"
+  remote_allowed: true
+  onsite_allowed_locations:
+    - "Darmstadt"
+    - "Frankfurt am Main"
+    - "Mainz"
+    - "Wiesbaden"
+    - "Heidelberg"
+  role_types:
+    - id: "working_student"
+      labels:
+        - "Werkstudent Softwareentwicklung"
+        - "Working Student Software"
+        - "Working Student Python"
+        - "Working Student Backend"
+        - "Working Student Data Engineering"
+        - "Working Student Machine Learning"
+    - id: "internship"
+      labels:
+        - "Praktikum Softwareentwicklung"
+        - "Internship Software"
+        - "Internship Data Science"
+    - id: "hiwi"
+      labels:
+        - "HiWi Informatik"
+        - "Student Assistant Computer Science"
+    - id: "thesis"
+      labels:
+        - "Masterarbeit Informatik"
+        - "Master Thesis Machine Learning"
+  hard_reject:
+    - "mandatory German above current level"
+    - "mandatory internship only"
+    - "senior role"
+    - "embedded or low-level hardware focus"
+    - "unpaid role"
+    - "impossible location"
+
+preferences:
+  earliest_start: "as soon as possible"
+  weekly_hours:
+    standard_student_limit: 20
+    internship_or_full_time_possible: true
+  preferred_domains:
+    - "software engineering"
+    - "backend"
+    - "data engineering"
+    - "machine learning"
+    - "AI tooling"
+  alternative_paid_work_allowed: true

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Jobseeker</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Jobseeker</h1>
+
+      <button id="startQueueTestBtn">Start Test Queue</button>
+      <input id="queueFileInput" type="file" accept=".json,.jsonl,.ndjson,application/json" />
+      <button id="importQueueBtn">Import Queue File</button>
+      <button id="startImportedQueueBtn">Start Imported Queue</button>
+      <button id="parseDetailsBtn">Parse Collected URLs</button>
+      <button id="stopAutoBtn">Stop Crawl</button>
+      <button id="showBtn">Show saved count</button>
+      <button id="exportBtn">Export JSON</button>
+      <button id="exportParsedBtn">Export Parsed Details</button>
+      <button id="clearBtn">Clear saved URLs</button>
+
+      <div id="status"></div>
+      <pre id="output"></pre>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

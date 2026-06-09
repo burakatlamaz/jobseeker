@@ -1,0 +1,209 @@
+version: 1
+description: >
+  Central search blueprint for generating job-search URLs from candidate_profile.yaml.
+  Keep role/location preferences in candidate_profile.yaml; keep query expansion and
+  source URL templates here.
+
+defaults:
+  recent_days: 14
+  radius_km: 30
+  sort: "date"
+
+query_generation:
+  include_role_only_queries: false
+  role_label_mode: "first_label"
+  active_locations:
+    - "Darmstadt"
+    - "Frankfurt am Main"
+    - "Mainz"
+    - "Wiesbaden"
+    - "Heidelberg"
+  explicit_queries:
+    - "Werkstudent Softwareentwicklung"
+    - "Working Student Software"
+    - "Werkstudent Python"
+    - "Working Student Python"
+    - "Werkstudent Backend"
+    - "Working Student Backend"
+    - "Werkstudent Data Engineering"
+    - "Working Student Data Engineering"
+    - "Werkstudent Machine Learning"
+    - "Working Student Machine Learning"
+    - "Werkstudent KI"
+    - "Werkstudent LLM"
+    - "HiWi Informatik"
+    - "Student Assistant Computer Science"
+    - "Praktikum Softwareentwicklung"
+    - "Internship Software"
+    - "Praktikum Data Science"
+    - "Internship Data Science"
+    - "Masterarbeit Informatik"
+    - "Master Thesis Machine Learning"
+  query_groups:
+    working_student:
+      - "Werkstudent Softwareentwicklung"
+      - "Working Student Software"
+      - "Werkstudent Python"
+      - "Working Student Python"
+      - "Werkstudent Backend"
+      - "Working Student Backend"
+      - "Werkstudent Data Engineering"
+      - "Working Student Data Engineering"
+      - "Werkstudent Machine Learning"
+      - "Working Student Machine Learning"
+      - "Werkstudent KI"
+      - "Werkstudent LLM"
+      - "Werkstudent Software Engineering"
+      - "Working Student AI"
+      - "Working Student Data Science"
+    internship:
+      - "Praktikum Softwareentwicklung"
+      - "Internship Software"
+      - "Praktikum Python"
+      - "Internship Python"
+      - "Praktikum Data Science"
+      - "Internship Data Science"
+      - "Praktikum Machine Learning"
+      - "Internship Machine Learning"
+      - "Praktikum KI"
+      - "AI Internship"
+      - "Software Engineering Internship"
+      - "Data Engineering Internship"
+    hiwi:
+      - "HiWi Informatik"
+      - "Studentische Hilfskraft Informatik"
+      - "Student Assistant Computer Science"
+      - "Research Assistant Computer Science"
+      - "HiWi Machine Learning"
+      - "HiWi Data Science"
+    thesis:
+      - "Masterarbeit Informatik"
+      - "Master Thesis Machine Learning"
+      - "Masterarbeit Machine Learning"
+      - "Master Thesis Computer Science"
+      - "Masterarbeit Data Science"
+      - "Master Thesis Data Science"
+    expanded_today:
+      - "Werkstudent Softwareentwicklung"
+      - "Working Student Software"
+      - "Werkstudent Python"
+      - "Working Student Python"
+      - "Werkstudent Backend"
+      - "Working Student Backend"
+      - "Werkstudent Data Engineering"
+      - "Working Student Data Engineering"
+      - "Werkstudent Machine Learning"
+      - "Working Student Machine Learning"
+      - "Werkstudent KI"
+      - "Werkstudent LLM"
+      - "Working Student AI"
+      - "Working Student Data Science"
+      - "Praktikum Softwareentwicklung"
+      - "Internship Software"
+      - "Praktikum Python"
+      - "Internship Python"
+      - "Praktikum Data Science"
+      - "Internship Data Science"
+      - "Praktikum Machine Learning"
+      - "Internship Machine Learning"
+      - "Praktikum KI"
+      - "AI Internship"
+      - "Software Engineering Internship"
+      - "Data Engineering Internship"
+  templates: []
+  focus_terms: []
+  negative_query_terms:
+    - "embedded"
+    - "senior"
+    - "lead"
+    - "manager"
+
+sources:
+  linkedin:
+    enabled: true
+    display_name: "LinkedIn"
+    url_template: "https://www.linkedin.com/jobs/search/?keywords={query_plus}&location={location_plus}&f_TPR=r1209600&sortBy=DD"
+    manual_verification: true
+    notes:
+      - "Use a clean anonymous Playwright profile; logged-in results are personalized."
+  indeed:
+    enabled: true
+    display_name: "Indeed Germany"
+    url_template: "https://de.indeed.com/jobs?q={query_plus}&l={location_plus}&fromage=14&sort=date"
+    manual_verification: true
+  stepstone:
+    enabled: true
+    display_name: "StepStone Germany"
+    url_template: "https://www.stepstone.de/jobs?what={query_plus}&where={location_plus}&radius=30&sort=2"
+    manual_verification: true
+  xing:
+    enabled: true
+    display_name: "Xing Jobs"
+    url_template: "https://www.xing.com/jobs/search?keywords={query_plus}&location={location_plus}"
+    manual_verification: true
+  arbeitsagentur:
+    enabled: true
+    display_name: "Bundesagentur fuer Arbeit"
+    url_template: "https://www.arbeitsagentur.de/jobsuche/suche?was={query_plus}&wo={location_plus}&angebotsart=1"
+    max_pages_per_search: 1
+  stellenwerk:
+    enabled: true
+    display_name: "Stellenwerk"
+    url_template: "https://www.stellenwerk.de/{location_slug}?_q={query_plus}"
+    manual_verification: true
+    supported_locations:
+      - "Darmstadt"
+      - "Frankfurt"
+      - "Mainz"
+      - "Wiesbaden"
+      - "Heidelberg"
+    location_slug_overrides:
+      "Frankfurt": "frankfurt"
+
+run_safety:
+  max_urls_per_source: 40
+  max_total_urls: 240
+  max_pages_per_search: 2
+  anonymous_profile: true
+  write_outputs:
+    json: "data/search/search_urls.json"
+    jsonl: "data/search/search_urls.jsonl"
+
+discovery:
+  source_order:
+    - "indeed"
+    - "stepstone"
+    - "linkedin"
+    - "xing"
+    - "arbeitsagentur"
+    - "stellenwerk"
+  max_search_groups_per_run: 20
+  max_pages_per_search: 2
+  max_jobs_per_search_page: 40
+  render_wait_seconds:
+    min: 1.5
+    max: 3.0
+  scroll:
+    enabled: true
+    steps: 10
+    wait_after_scroll_seconds: 0.6
+  manual_verification:
+    enabled: true
+    auto_pause_in_headed_mode: true
+    indicators:
+      - "verify you are human"
+      - "are you a human"
+      - "human verification"
+      - "additional verification required"
+      - "checking your browser"
+      - "just a moment"
+      - "cloudflare"
+      - "cf-challenge"
+      - "authwall"
+      - "captcha"
+      - "login"
+      - "sign in"
+      - "anmelden"
+  write_outputs:
+    discovered_jsonl: "data/discovered/discovered_jobs.jsonl"
+    debug_json: "data/discovered/discovery_debug.json"

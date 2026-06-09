@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Jobseeker",
+  "version": "1.3.0",
+  "description": "Collect job posting URLs from search result pages across multiple job sites.",
+  "permissions": ["storage", "activeTab", "scripting", "tabs", "downloads"],
+  "host_permissions": [
+    "https://www.linkedin.com/*",
+    "https://de.indeed.com/*",
+    "https://www.stepstone.de/*",
+    "https://www.xing.com/*",
+    "https://www.arbeitsagentur.de/*",
+    "https://www.stellenwerk.de/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Jobseeker"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.linkedin.com/jobs/*",
+        "https://de.indeed.com/*",
+        "https://www.stepstone.de/*",
+        "https://www.xing.com/jobs/*",
+        "https://www.arbeitsagentur.de/jobsuche/*",
+        "https://www.stellenwerk.de/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
